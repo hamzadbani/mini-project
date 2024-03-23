@@ -3,12 +3,12 @@ package com.miniprojet.miniprojet.controller;
 import com.miniprojet.miniprojet.entity.User;
 import com.miniprojet.miniprojet.service.UserService;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 
 import java.util.List;
 
@@ -30,5 +30,22 @@ public class UserController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(users);
+    }
+
+    @PostMapping(value = "/batch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadUsersBatch(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Veuillez fournir un fichier valide.");
+        }
+
+        try {
+            userService.saveUsersFromFile(file);
+            int totalImported = userService.getTotalImported();
+            int totalFailed = userService.getTotalFailedImport();
+            return ResponseEntity.ok().body("Importation réussie : " + totalImported +
+                    " utilisateurs. Importation échouée : " + totalFailed);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Une erreur s'est produite lors du traitement du fichier.");
+        }
     }
 }

@@ -1,15 +1,31 @@
 package com.miniprojet.miniprojet.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.miniprojet.miniprojet.entity.User;
+import com.miniprojet.miniprojet.repository.UserRepository;
+import lombok.Getter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.github.javafaker.Faker;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserService {
 
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final Faker faker = new Faker();
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public List<User> generateUsers(int count) {
         List<User> users = new ArrayList<>();
@@ -43,6 +59,32 @@ public class UserService {
     }
     private String generateUsername(String firstName, String lastName) {
         return firstName.toLowerCase() + "." + lastName.toLowerCase();
+    }
+
+    @Getter
+    private int totalImported;
+    @Getter
+    private int totalFailedImport;
+
+    public void saveUsersFromFile(MultipartFile file) throws IOException {
+        totalImported = 0;
+        totalFailedImport = 0;
+
+        try (InputStream inputStream = file.getInputStream()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<User> users = objectMapper.readValue(inputStream, new TypeReference<>() {
+            });
+
+            for (User user : users) {
+                if (!userRepository.existsByUsername(user.getUsername()) && !userRepository.existsByEmail(user.getEmail())) {
+                    user.setPassword(passwordEncoder.encode(user.getPassword()));
+                    userRepository.save(user);
+                    totalImported++;
+                } else {
+                    totalFailedImport++;
+                }
+            }
+        }
     }
 
 }
