@@ -3,7 +3,6 @@ package com.miniprojet.miniprojet.controller;
 import com.miniprojet.miniprojet.entity.User;
 import com.miniprojet.miniprojet.repository.UserRepository;
 import com.miniprojet.miniprojet.security.service.AuthService;
-import com.miniprojet.miniprojet.security.util.JwtTokenUtil;
 import com.miniprojet.miniprojet.service.UserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -59,10 +58,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<User> getCurrentUser(@RequestHeader("Authorization") String token) {
-        if (!JwtTokenUtil.isTokenValid(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+    public ResponseEntity<User> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
 
@@ -73,11 +69,8 @@ public class UserController {
         return ResponseEntity.ok(currentUser);
     }
 
-    @GetMapping("{username}")
-    public ResponseEntity<User> getUserProfile(@PathVariable String username, @RequestHeader("Authorization") String token) {
-        if (!JwtTokenUtil.isTokenValid(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+    @GetMapping("/{username}")
+    public ResponseEntity<User> getUserProfile(@PathVariable String username) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();

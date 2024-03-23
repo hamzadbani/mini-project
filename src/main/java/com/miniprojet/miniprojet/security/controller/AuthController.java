@@ -3,8 +3,10 @@ package com.miniprojet.miniprojet.security.controller;
 import com.miniprojet.miniprojet.entity.User;
 import com.miniprojet.miniprojet.security.util.JwtResponse;
 import com.miniprojet.miniprojet.security.util.JwtTokenUtil;
+import com.miniprojet.miniprojet.security.util.JwtUtil;
 import com.miniprojet.miniprojet.security.util.LoginForm;
 import com.miniprojet.miniprojet.security.service.AuthService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,8 +18,11 @@ public class AuthController {
 
     private final AuthService authService;
 
-    public AuthController(AuthService authService) {
+    private final JwtUtil jwtUtil;
+
+    public AuthController(AuthService authService, JwtUtil jwtUtil) {
         this.authService = authService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/api/auth")
@@ -27,7 +32,9 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nom d'utilisateur ou mot de passe incorrect.");
         }
 
-        String token = JwtTokenUtil.generateToken(user);
-        return ResponseEntity.ok(new JwtResponse(token));
+        //String token = JwtTokenUtil.generateToken(user);
+        String token = jwtUtil.issueToken(user.getEmail(), "ROLE_" + user.getRole());
+        //new JwtResponse(token)
+        return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, token).build();
     }
 }
