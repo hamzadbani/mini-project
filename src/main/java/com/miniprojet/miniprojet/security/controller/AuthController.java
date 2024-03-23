@@ -27,7 +27,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nom d'utilisateur ou mot de passe incorrect.");
         }
 
-        String token = JwtTokenUtil.generateToken(user.getEmail());
+        String token = JwtTokenUtil.generateToken(user);
         return ResponseEntity.ok(new JwtResponse(token));
     }
 }
