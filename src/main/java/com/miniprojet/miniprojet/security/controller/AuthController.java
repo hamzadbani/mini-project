@@ -1,8 +1,6 @@
 package com.miniprojet.miniprojet.security.controller;
 
 import com.miniprojet.miniprojet.entity.User;
-import com.miniprojet.miniprojet.security.util.JwtResponse;
-import com.miniprojet.miniprojet.security.util.JwtTokenUtil;
 import com.miniprojet.miniprojet.security.util.JwtUtil;
 import com.miniprojet.miniprojet.security.util.LoginForm;
 import com.miniprojet.miniprojet.security.service.AuthService;
@@ -32,9 +30,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nom d'utilisateur ou mot de passe incorrect.");
         }
 
-        //String token = JwtTokenUtil.generateToken(user);
         String token = jwtUtil.issueToken(user.getEmail(), "ROLE_" + user.getRole());
-        //new JwtResponse(token)
         return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, token).build();
     }
 }

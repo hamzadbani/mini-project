@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -16,7 +17,8 @@ import static java.time.temporal.ChronoUnit.*;
 @Service
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "ABCDEFGHIJK0123456789_FGHIJ_FakeSecret_JK0123456789_FGHIJ";
+    @Value("${myapp.secret-key}")
+    private String secretKey;
 
     public String issueToken(String subject) {
         return  issueToken(subject, Map.of());
@@ -55,7 +57,7 @@ public class JwtUtil {
     }
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+        return Keys.hmacShaKeyFor(getSecretKey().getBytes());
     }
 
     public boolean isTokenValid(String jwt, String username) {
@@ -66,5 +68,9 @@ public class JwtUtil {
     private boolean isTokenExpired(String jwt) {
         Date today = Date.from(Instant.now());
         return getClaims(jwt).getExpiration().before(today);
+    }
+
+    public String getSecretKey() {
+        return secretKey;
     }
 }

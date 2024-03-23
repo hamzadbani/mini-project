@@ -1,4 +1,4 @@
-package com.miniprojet.miniprojet.security;
+package com.miniprojet.miniprojet.security.config;
 
 import com.miniprojet.miniprojet.security.util.JWTAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -28,19 +28,6 @@ public class SecurityConfig {
 
     private static final String[] WHITE_LIST_URL = {"/api/users/generate", "/api/users/batch", "/swagger-ui.html",
             "/v3/api-docs/**", "/api/auth"};
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .authorizeHttpRequests(req ->
-//                        req.requestMatchers(WHITE_LIST_URL)
-//                                .permitAll()
-//                                .requestMatchers("/api/users/me").authenticated()
-//                )
-//        ;
-//
-//        return http.build();
-//    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
