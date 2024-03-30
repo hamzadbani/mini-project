@@ -63,8 +63,12 @@ Secured: yes
 When the JWT token corresponds to a user with admin role, it is possible to view the profile of any other user.
 
 
-**Java 17 and Spring Boot 3.2.**
+**Java 17 and Spring Boot 3.2.** 
+
 **H2 database.**
+
 **The application start on port 9090.**
+
 **Expose a Swagger endpoint.**
+
 **Utilize java Faker library to generate users.**
